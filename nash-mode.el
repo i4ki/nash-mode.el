@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2016
 
-;; Author:  <i4k@johncarter.starwars>
+;; Author: Tiago Natel de Moura  <tiago4orion@gmail.com>
 
 ;; Keywords: nash, languages
 
