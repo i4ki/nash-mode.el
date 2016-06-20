@@ -14,7 +14,7 @@ There's several ways to use a major mode and the code below is only an example:
 (require 'nash-mode)
 
 ;; to use nash-mode for sh scripts (instead of sh-mode)
-(add-to-ordered-list 'auto-mode-alist (cons "\\.sh" 'nash-mode) 1)
+(add-to-list 'auto-mode-alist (cons "\\.sh" 'nash-mode))
 
 (defun my-nash-mode-hook ()
   ;; If you want to format your scripts accordinly to nashfmt
