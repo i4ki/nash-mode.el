@@ -8,8 +8,6 @@
 
 ;;; Code:
 
-(require 'go-mode)
-
 (setq nash-keywords '("if" "else" "for" "import" "bindfn" "dump" "setenv" "fn") )
 (setq nash-builtins '("len"))
 
@@ -59,6 +57,49 @@ a `before-save-hook'."
         (quit-window t win)
       (kill-buffer errbuf))))
 
+(defun nash--apply-rcs-patch (patch-buffer)
+  "Apply an RCS-formatted diff from PATCH-BUFFER to the current buffer."
+  (let ((target-buffer (current-buffer))
+        ;; Relative offset between buffer line numbers and line numbers
+        ;; in patch.
+        ;;
+        ;; Line numbers in the patch are based on the source file, so
+        ;; we have to keep an offset when making changes to the
+        ;; buffer.
+        ;;
+        ;; Appending lines decrements the offset (possibly making it
+        ;; negative), deleting lines increments it. This order
+        ;; simplifies the forward-line invocations.
+        (line-offset 0))
+    (save-excursion
+      (with-current-buffer patch-buffer
+        (goto-char (point-min))
+        (while (not (eobp))
+          (unless (looking-at "^\\([ad]\\)\\([0-9]+\\) \\([0-9]+\\)")
+            (error "invalid rcs patch or internal error in go--apply-rcs-patch"))
+          (forward-line)
+          (let ((action (match-string 1))
+                (from (string-to-number (match-string 2)))
+                (len  (string-to-number (match-string 3))))
+            (cond
+             ((equal action "a")
+              (let ((start (point)))
+                (forward-line len)
+                (let ((text (buffer-substring start (point))))
+                  (with-current-buffer target-buffer
+                    (cl-decf line-offset len)
+                    (goto-char (point-min))
+                    (forward-line (- from len line-offset))
+                    (insert text)))))
+             ((equal action "d")
+              (with-current-buffer target-buffer
+                (goto-char (point-min))
+                (forward-line (- from line-offset 1))
+                (setq line-offset (+ line-offset len))
+                (kill-whole-line len)))
+             (t
+              (error "invalid rcs patch or internal error in nash--apply-rcs-patch")))))))))
+
 (defun nashfmt ()
   "Format the current buffer according to the nashfmt tool."
   (interactive)
@@ -93,7 +134,7 @@ a `before-save-hook'."
               (progn
                 (if (zerop (call-process-region (point-min) (point-max) "diff" nil patchbuf nil "-n" "-" tmpfile))
                     (message "Buffer is already nashfmted")
-                  (go--apply-rcs-patch patchbuf)
+                  (nash--apply-rcs-patch patchbuf)
                   (message "Applied nashfmt"))
                 (if errbuf (nashfmt--kill-error-buffer errbuf)))
             (message "Could not apply nashfmt")
@@ -117,7 +158,7 @@ a `before-save-hook'."
 (defun nashfmt-before-save ()
   "Add this to .emacs to run nashfmt on the current buffer when saving:
  (add-hook 'before-save-hook 'gofmt-before-save).
-Note that this will cause go-mode to get loaded the first time
+Note that this will cause nash-mode to get loaded the first time
 you save any file, kind of defeating the point of autoloading."
 
   (interactive)
