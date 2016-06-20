@@ -76,7 +76,7 @@ a `before-save-hook'."
         (goto-char (point-min))
         (while (not (eobp))
           (unless (looking-at "^\\([ad]\\)\\([0-9]+\\) \\([0-9]+\\)")
-            (error "invalid rcs patch or internal error in go--apply-rcs-patch"))
+            (error "invalid rcs patch or internal error in nashfmt--apply-rcs-patch"))
           (forward-line)
           (let ((action (match-string 1))
                 (from (string-to-number (match-string 2)))
@@ -99,6 +99,26 @@ a `before-save-hook'."
                 (kill-whole-line len)))
              (t
               (error "invalid rcs patch or internal error in nash--apply-rcs-patch")))))))))
+
+(defun nashfmt--process-errors (filename tmpfile errbuf)
+  (with-current-buffer errbuf
+    (if (eq nashfmt-show-errors 'echo)
+        (progn
+          (message "%s" (buffer-string))
+          (nashfmt--kill-error-buffer errbuf))
+
+      ;; Convert the nashfmt stderr to something understood by the compilation mode.
+      (goto-char (point-min))
+      (if (save-excursion
+            (save-match-data
+              (search-forward "flag provided but not defined: -srcdir" nil t)))
+          (insert "Your version of goimports is too old and doesn't support vendoring. Please update goimports!\n\n"))
+      (insert "nashfmt errors:\n")
+      (let ((truefile tmpfile))
+        (while (search-forward-regexp (concat "^\\(" (regexp-quote truefile) "\\):") nil t)
+          (replace-match (file-name-nondirectory filename) t t nil 1)))
+      (compilation-mode)
+      (display-buffer errbuf))))
 
 (defun nashfmt ()
   "Format the current buffer according to the nashfmt tool."
@@ -157,7 +177,7 @@ a `before-save-hook'."
 ;;;###autoload
 (defun nashfmt-before-save ()
   "Add this to .emacs to run nashfmt on the current buffer when saving:
- (add-hook 'before-save-hook 'gofmt-before-save).
+ (add-hook 'before-save-hook 'nashfmt-before-save).
 Note that this will cause nash-mode to get loaded the first time
 you save any file, kind of defeating the point of autoloading."
 
