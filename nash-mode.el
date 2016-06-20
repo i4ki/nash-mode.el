@@ -1,4 +1,4 @@
-;;; nash.el --- Nash major mode                      -*- lexical-binding: t; -*-
+;;; nash-mode.el --- Nash major mode                      -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016
 ;; Author: Tiago Natel de Moura  <tiago4orion@gmail.com>
