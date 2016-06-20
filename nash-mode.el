@@ -123,6 +123,7 @@ you save any file, kind of defeating the point of autoloading."
   (interactive)
   (when (eq major-mode 'nash-mode) (nashfmt)))
 
+;;;###autoload
 (define-derived-mode nash-mode fundamental-mode
   "nash mode"
   "Major mode for editing Nash (github.com/NeowayLabs/nash)"
