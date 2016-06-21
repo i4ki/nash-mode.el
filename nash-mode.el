@@ -8,15 +8,15 @@
 
 ;;; Code:
 
-(setq nash-keywords '("if" "else" "for" "import" "bindfn" "dump" "setenv" "fn") )
-(setq nash-builtins '("len"))
+(defvar nash-keywords '("if" "else" "for" "import" "bindfn" "dump" "setenv" "fn") )
+(defvar nash-builtins '("len"))
 
 (defconst nash-comment-regexp "#.*")
 (defconst nash-identifier-regexp "[[:word:][:multibyte:]]+")
 (defconst nash-variable-regexp (concat "$" nash-identifier-regexp))
 
-(setq nash-keywords-regexp (regexp-opt nash-keywords 'words))
-(setq nash-builtins-regexp (regexp-opt nash-builtins 'words))
+(defvar nash-keywords-regexp (regexp-opt nash-keywords 'words))
+(defvar nash-builtins-regexp (regexp-opt nash-builtins 'words))
 
 (defgroup nash nil
   "Major mode for editing Nash code."
@@ -164,15 +164,15 @@ a `before-save-hook'."
       (delete-file tmpfile)
       )))
 
-(setq nash-font-lock-keywords
-      `(
-        (,nash-variable-regexp . font-lock-constant-face)
-        (,nash-builtins-regexp . font-lock-function-name-face)
-        (,nash-keywords-regexp . font-lock-keyword-face)
-        (,nash-comment-regexp . font-lock-comment-face)
-        ;; note: order above matters, because once colored, that part won't change.
-        ;; in general, longer words first
-        ))
+(defvar nash-font-lock-keywords
+  `(
+    (,nash-variable-regexp . font-lock-constant-face)
+    (,nash-builtins-regexp . font-lock-function-name-face)
+    (,nash-keywords-regexp . font-lock-keyword-face)
+    (,nash-comment-regexp . font-lock-comment-face)
+    ;; note: order above matters, because once colored, that part won't change.
+    ;; in general, longer words first
+    ))
 
 ;;;###autoload
 (defun nashfmt-before-save ()
