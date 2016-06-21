@@ -1,10 +1,16 @@
 ;;; nash-mode.el --- Nash major mode                      -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2016
-;; Author: Tiago Natel de Moura  <tiago4orion@gmail.com>
+;; Copyright 2016 Tiago Natel de Moura. All rights reserved.
+;; Use of this source code is governed by a BSD-style
+;; license that can be found in the LICENSE file.
 
-;; Keywords: nash, languages
-;; This package was created based on go-mode.
+;; Author: Tiago Natel de Moura
+;; Version: 0.1
+;; Keywords: nash languages
+;; URL: https://github.com/tiago4orion/nash-mode.el
+
+;; This package is not part of GNU Emacs.
+;; Based on go-mode.el
 
 ;;; Code:
 
