@@ -57,6 +57,11 @@ a `before-save-hook'."
           (const :tag "None" nil))
   :group 'nash)
 
+(unless (fboundp 'setq-local)
+    (defmacro setq-local (var val)
+      "Set variable VAR to value VAL in current buffer."
+      `(set (make-local-variable ',var) ,val)))
+
 (defun nashfmt--kill-error-buffer (errbuf)
   (let ((win (get-buffer-window errbuf)))
     (if win
