@@ -184,10 +184,11 @@ a `before-save-hook'."
 ;;;###autoload
 (defun nash-fmt-before-save ()
   "Add this to .emacs to run nashfmt on the current buffer when saving:
- (add-hook 'before-save-hook 'nash-fmt-before-save).
-Note that this will cause nash-mode to get loaded the first time
-you save any file, kind of defeating the point of autoloading."
+  (add-hook 'nash-mode-hook 'nash-fmt-enable-on-save)
 
+  where nash-fmt-enable-on-save would be a function which calls
+
+ (add-hook 'before-save-hook 'nash-fmt-before-save)"
   (interactive)
   (when (eq major-mode 'nash-mode) (nash-fmt)))
 
