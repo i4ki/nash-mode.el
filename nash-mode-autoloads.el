@@ -3,14 +3,14 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "nash-mode" "nash-mode.el" (22375 63943 79582
-;;;;;;  72000))
+;;;### (autoloads nil "nash-mode" "nash-mode.el" (22384 29966 886222
+;;;;;;  872000))
 ;;; Generated autoloads from nash-mode.el
 
-(autoload 'nashfmt-before-save "nash-mode" "\
+(autoload 'nash-fmt-before-save "nash-mode" "\
 Add this to .emacs to run nashfmt on the current buffer when saving:
- (add-hook 'before-save-hook 'gofmt-before-save).
-Note that this will cause go-mode to get loaded the first time
+ (add-hook 'before-save-hook 'nash-fmt-before-save).
+Note that this will cause nash-mode to get loaded the first time
 you save any file, kind of defeating the point of autoloading.
 
 \(fn)" t nil)
