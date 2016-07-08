@@ -183,9 +183,9 @@ a `before-save-hook'."
 
   where nash-fmt-enable-on-save would be a function which calls
 
- (add-hook 'before-save-hook 'nash-fmt-before-save)"
+ (add-hook 'before-save-hook 'nash-fmt-before-save nil 'local)"
   (interactive)
-  (when (eq major-mode 'nash-mode) (nash-fmt)))
+  (nash-fmt))
 
 ;;;###autoload
 (define-derived-mode nash-mode fundamental-mode
