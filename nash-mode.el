@@ -57,11 +57,6 @@ a `before-save-hook'."
           (const :tag "None" nil))
   :group 'nash)
 
-(unless (fboundp 'setq-local)
-    (defmacro setq-local (var val)
-      "Set variable VAR to value VAL in current buffer."
-      `(set (make-local-variable ',var) ,val)))
-
 (defun nash-fmt--kill-error-buffer (errbuf)
   (let ((win (get-buffer-window errbuf)))
     (if win
@@ -196,10 +191,11 @@ a `before-save-hook'."
 (define-derived-mode nash-mode fundamental-mode
   "nash mode"
   "Major mode for editing Nash (github.com/NeowayLabs/nash)"
-  (setq-local comment-start "# ")
-  (setq-local comment-end "")
+  (set (make-local-variable 'comment-start) "# ")
+  (set (make-local-variable 'comment-end) "")
 
-  ;; code for syntax highlighting
+       ;; code for syntax highlighting
+
   (setq font-lock-defaults '((nash-font-lock-keywords))))
 
 (provide 'nash-mode)
