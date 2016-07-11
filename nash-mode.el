@@ -34,18 +34,18 @@
   :type 'hook
   :group 'nash)
 
-(defcustom nashfmt-command "nashfmt"
+(defcustom nash-fmt-command "nashfmt"
   "The 'nashfmt' command."
   :type 'string
   :group 'nash)
 
 
-(defcustom nashfmt-args nil
+(defcustom nash-fmt-args nil
   "Additional arguments to pass to nashfmt."
   :type '(repeat string)
   :group 'nash)
 
-(defcustom nashfmt-show-errors 'buffer
+(defcustom nash-fmt-show-errors 'buffer
   "Where to display nashfmt error output.
 It can either be displayed in its own buffer, in the echo area, or not at all.
 Please note that Emacs outputs to the echo area when writing
@@ -57,7 +57,7 @@ a `before-save-hook'."
           (const :tag "None" nil))
   :group 'nash)
 
-(defun nashfmt--kill-error-buffer (errbuf)
+(defun nash-fmt--kill-error-buffer (errbuf)
   (let ((win (get-buffer-window errbuf)))
     (if win
         (quit-window t win)
@@ -82,7 +82,7 @@ a `before-save-hook'."
         (goto-char (point-min))
         (while (not (eobp))
           (unless (looking-at "^\\([ad]\\)\\([0-9]+\\) \\([0-9]+\\)")
-            (error "invalid rcs patch or internal error in nashfmt--apply-rcs-patch"))
+            (error "invalid rcs patch or internal error in nash-fmt--apply-rcs-patch"))
           (forward-line)
           (let ((action (match-string 1))
                 (from (string-to-number (match-string 2)))
@@ -106,29 +106,29 @@ a `before-save-hook'."
              (t
               (error "invalid rcs patch or internal error in nash--apply-rcs-patch")))))))))
 
-(defun nashfmt--process-errors (filename tmpfile errbuf)
+(defun nash-fmt--process-errors (filename tmpfile errbuf)
   (with-current-buffer errbuf
-    (if (eq nashfmt-show-errors 'echo)
+    (if (eq nash-fmt-show-errors 'echo)
         (progn
           (message "%s" (buffer-string))
-          (nashfmt--kill-error-buffer errbuf))
+          (nash-fmt--kill-error-buffer errbuf))
 
-      ;; Convert the nashfmt stderr to something understood by the compilation mode.
+      ;; Convert the nash-fmt stderr to something understood by the compilation mode.
       (goto-char (point-min))
-      (insert "nashfmt errors:\n")
+      (insert "nash-fmt errors:\n")
       (let ((truefile tmpfile))
         (while (search-forward-regexp (concat "^\\(" (regexp-quote truefile) "\\):") nil t)
           (replace-match (file-name-nondirectory filename) t t nil 1)))
       (compilation-mode)
       (display-buffer errbuf))))
 
-(defun nashfmt ()
+(defun nash-fmt ()
   "Format the current buffer according to the nashfmt tool."
   (interactive)
 
   (let ((tmpfile (make-temp-file "nashfmt" nil ".sh"))
         (patchbuf (get-buffer-create "*Nashfmt patch*"))
-        (errbuf (if nashfmt-show-errors (get-buffer-create "*Nashfmt Errors*")))
+        (errbuf (if nash-fmt-show-errors (get-buffer-create "*Nashfmt Errors*")))
         (coding-system-for-read 'utf-8)
         (coding-system-for-write 'utf-8)
         our-nashfmt-args)
@@ -146,21 +146,21 @@ a `before-save-hook'."
           (write-region nil nil tmpfile)
 
           (setq our-nashfmt-args (append our-nashfmt-args
-                                       nashfmt-args
+                                       nash-fmt-args
                                        (list "-w" tmpfile)))
-          (message "Calling nashfmt: %s %s" nashfmt-command our-nashfmt-args)
+          (message "Calling nashfmt: %s %s" nash-fmt-command our-nashfmt-args)
           ;; We're using errbuf for the mixed stdout and stderr output. This
           ;; is not an issue because nashfmt -w does not produce any stdout
           ;; output in case of success.
-          (if (zerop (apply #'call-process nashfmt-command nil errbuf nil our-nashfmt-args))
+          (if (zerop (apply #'call-process nash-fmt-command nil errbuf nil our-nashfmt-args))
               (progn
                 (if (zerop (call-process-region (point-min) (point-max) "diff" nil patchbuf nil "-n" "-" tmpfile))
                     (message "Buffer is already nashfmted")
                   (nash--apply-rcs-patch patchbuf)
                   (message "Applied nashfmt"))
-                (if errbuf (nashfmt--kill-error-buffer errbuf)))
+                (if errbuf (nash-fmt--kill-error-buffer errbuf)))
             (message "Could not apply nashfmt")
-            (if errbuf (nashfmt--process-errors (buffer-file-name) tmpfile errbuf))))
+            (if errbuf (nash-fmt--process-errors (buffer-file-name) tmpfile errbuf))))
 
       (kill-buffer patchbuf)
       (delete-file tmpfile)
@@ -177,23 +177,22 @@ a `before-save-hook'."
     ))
 
 ;;;###autoload
-(defun nashfmt-before-save ()
-  "Add this to .emacs to run nashfmt on the current buffer when saving:
- (add-hook 'before-save-hook 'nashfmt-before-save).
-Note that this will cause nash-mode to get loaded the first time
-you save any file, kind of defeating the point of autoloading."
-
+(defun nash-fmt-enable-on-save ()
+  "Add this to `nash-mode-hook' to run nashfmt on the current buffer when saving.
+e.g. include something like the following in your emacs startup file:
+   (add-hook 'nash-mode-hook 'nash-fmt-enable-on-save)"
   (interactive)
-  (when (eq major-mode 'nash-mode) (nashfmt)))
+  (add-hook 'before-save-hook 'nash-fmt nil 'local))
 
 ;;;###autoload
 (define-derived-mode nash-mode fundamental-mode
   "nash mode"
   "Major mode for editing Nash (github.com/NeowayLabs/nash)"
-  (setq-local comment-start "# ")
-  (setq-local comment-end "")
+  (set (make-local-variable 'comment-start) "# ")
+  (set (make-local-variable 'comment-end) "")
 
-  ;; code for syntax highlighting
+       ;; code for syntax highlighting
+
   (setq font-lock-defaults '((nash-font-lock-keywords))))
 
 (provide 'nash-mode)
