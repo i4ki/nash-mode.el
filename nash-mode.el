@@ -177,15 +177,12 @@ a `before-save-hook'."
     ))
 
 ;;;###autoload
-(defun nash-fmt-before-save ()
-  "Add this to .emacs to run nashfmt on the current buffer when saving:
-  (add-hook 'nash-mode-hook 'nash-fmt-enable-on-save)
-
-  where nash-fmt-enable-on-save would be a function which calls
-
- (add-hook 'before-save-hook 'nash-fmt-before-save nil 'local)"
+(defun nash-fmt-enable-on-save ()
+  "Add this to `nash-mode-hook' to run nashfmt on the current buffer when saving.
+e.g. include something like the following in your emacs startup file:
+   (add-hook 'nash-mode-hook 'nash-fmt-enable-on-save)"
   (interactive)
-  (nash-fmt))
+  (add-hook 'before-save-hook 'nash-fmt nil 'local))
 
 ;;;###autoload
 (define-derived-mode nash-mode fundamental-mode
