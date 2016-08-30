@@ -190,6 +190,7 @@ e.g. include something like the following in your emacs startup file:
   "Major mode for editing Nash (github.com/NeowayLabs/nash)"
   (set (make-local-variable 'comment-start) "# ")
   (set (make-local-variable 'comment-end) "")
+  (setq indent-tabs-mode t)
 
        ;; code for syntax highlighting
 
