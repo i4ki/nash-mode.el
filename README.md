@@ -26,8 +26,8 @@ If you prefer through [use-package](https://github.com/jwiegley/use-package).
 ```elisp
 (use-package nash-mode
   :ensure t
-  :config
+  :commands (nash-mode)
   ;; to use nash-mode for sh scripts (instead of sh-mode)
-  (add-to-list 'auto-mode-alist (cons "\\.sh\\'" 'nash-mode))
-  (add-hook 'nash-mode-hook #'nash-fmt-enable-on-save))
+  :mode "\\.sh\\'"
+  :init (add-hook 'nash-mode-hook #'nash-fmt-enable-on-save))
 ```
